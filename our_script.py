@@ -1,8 +1,8 @@
-
+import random
 import math
 import time
 import numpy as np
-from numpy import random
+from numpy import random as rd
 
 name = 'byte brawlers'
 
@@ -181,14 +181,13 @@ def ActPirate(pirate):
         return 0
     elif signal.startswith('i'):
         return assigned_pos(pirate)
-        print("reached assigned pirates return")
     if signal.startswith('e'):
         return random_walk()
-        print("reached explorer pirates return")
     elif signal.startswith('c'):
+        
         if pirate.getTeamSignal() == '':
             return random_walk()
-            print("reached capturer pirates return")
+    
         else:
             temp = pirate.getTeamSignal().split(',')
         s = pirate.trackPlayers()
@@ -197,6 +196,8 @@ def ActPirate(pirate):
         move = moveTo(int(temp[1]),int(temp[2]),pirate)
         if move != 0:
             return move
+        else:
+            return 1
 
     
     
@@ -206,6 +207,15 @@ def ActPirate(pirate):
 def ActTeam(team):
     list1 = team.getListOfSignals()
     time = team.getCurrentFrame()
+    s = team.trackPlayers()
+    print(s)
+    if 'myCaptur' in s[0]:
+        team.buildWalls(1)
+    if 'myCaptur' in s[1]:
+        team.buildWalls(2)
+    if 'myCaptur' in s[2]:
+        team.buildWalls(3)
+
     # print(time, list1)
 # quadrants
 # random walk
@@ -222,9 +232,45 @@ def assigned_pos(pirate):
         return moveTo(temp[0], temp[1], pirate)
         
     else:
-        if random.choice(['e','c'], p = [0.7, 0.3], size = (1))[0] == 'e':
+        if rd.choice(['e','c'], p = [0.7, 0.3], size = (1))[0] == 'e':
             pirate.setSignal('e')
         else:
             pirate.setSignal('c')
         return 0
     
+def new_(pirate):
+    id = pirate.getID()
+    X = pirate.getDimensionX()
+    Y = pirate.getDimensionY()
+    posx, posy = pirate.getDeployPoint()
+    signal = pirate.getSignal()
+    q = (0,0)
+    if posx <= X//2:
+        if posy <=Y//2:
+            q = (X//4, Y//4)
+        else:
+            q  = (X//4,3*Y//4)
+    else:
+        if posy <= Y//2:
+            q = (3*X//4,Y//4)
+        else:
+            q = (3*X//4,3*Y//4)
+    if signal == '':
+        if int(id) < 21:
+            if moveTo(q[0], q[1],pirate) == 0:
+                pirate.setSignal("random")
+            return moveTo(q[0], q[1],pirate)
+        elif int(id) < 41:
+            if moveTo(q[0], q[1],pirate) == 0:
+                pirate.setSignal("random")
+            return moveTo(((q[0]+X//2)%X), ((q[1]+Y//2)%Y), pirate)
+        elif int(id) < 61:
+            if moveTo(q[0], q[1],pirate) == 0:
+                pirate.setSignal("random")
+            return moveTo(abs((q[0]-X//2))%X, abs((q[1]-Y//2))%Y,pirate)
+        else:
+            return random_walk()
+    else:
+        return random_walk()
+        
+        
