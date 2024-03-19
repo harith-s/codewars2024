@@ -136,4 +136,4 @@ def ActTeam(team):
 # random walk
 # flags
 # islands status
-# move to some particular set amount of pirates
+# move to some particular set amount of piratesfsajgkfasf
